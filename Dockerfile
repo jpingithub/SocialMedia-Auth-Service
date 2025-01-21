@@ -25,7 +25,7 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 # Copy the JAR file from the builder stage
-COPY --from=builder /app/build/libs/auth-service-0.0.1-SNAPSHOT.jar app.jar
+COPY --from=builder /app/build/libs/Auth-Service-0.0.1-SNAPSHOT.jar app.jar
 
 # Expose the application's port
 EXPOSE 8081

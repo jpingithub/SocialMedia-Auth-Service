@@ -11,8 +11,8 @@ COPY gradle /app/gradle/
 # Ensure gradlew is executable
 RUN chmod +x gradlew
 
-# Download dependencies
-RUN ./gradlew dependencies --no-daemon
+# Download dependencies and build the application (skip tests to speed up the build)
+RUN ./gradlew clean build -x test --no-daemon
 
 # Copy the source code and build the application
 COPY src /app/src

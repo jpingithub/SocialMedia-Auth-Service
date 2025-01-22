@@ -1,14 +1,12 @@
-# Use an official OpenJDK runtime as a parent image
-FROM openjdk:17-jdk-slim
-
-# Set a working directory inside the container
+# Build stage
+FROM gradle:8.2.1-jdk17 AS builder
 WORKDIR /app
+COPY . .
+RUN gradle clean build -x test
 
-# Copy the JAR file into the container
-COPY build/libs/Auth-Service-0.0.1-SNAPSHOT.jar app.jar
-
-# Expose the application's port (match it with the port configured in your app)
-EXPOSE 8081
-
-# Specify the command to run the JAR file
+# Runtime stage
+FROM openjdk:17-jdk-slim
+WORKDIR /app
+COPY --from=builder /app/build/libs/Auth-Service-0.0.1-SNAPSHOT.jar app.jar
+EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]

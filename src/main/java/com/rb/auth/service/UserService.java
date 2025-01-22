@@ -23,6 +23,7 @@ public class UserService {
 
     public UserEntity saveUser(UserDto userDto){
         final UserEntity user = objectMapper.convertValue(userDto, UserEntity.class);
+        user.setRole(userDto.getRole().toUpperCase());
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         return userRepository.save(user);
     }

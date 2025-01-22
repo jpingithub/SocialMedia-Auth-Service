@@ -19,7 +19,8 @@ public class TokenService {
 
     public String generateToken(Authentication authentication){
         final Instant now = Instant.now();
-        String roles = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.joining(","));
+        String roles = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
         final JwtClaimsSet jwtClaimsSet = JwtClaimsSet.builder()
                 .issuer("RealBoy.org")
                 .issuedAt(now)

@@ -1,6 +1,5 @@
 package com.rb.auth.service;
 
-import com.rb.auth.entity.UserEntity;
 import com.rb.auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +16,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByUsername(username).orElseThrow();
+        return new AuthenticatedUser(userRepository.findByUsername(username).orElseThrow());
     }
 }

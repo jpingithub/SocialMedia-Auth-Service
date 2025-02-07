@@ -41,13 +41,18 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/api/v1/users/register", "/api/v1/users/login").permitAll();
+                    auth.requestMatchers(
+                            "/api/v1/users/register",
+                            "/api/v1/users/login",
+                            "/api/v1/users/validate"
+                    ).permitAll();
                     auth.anyRequest().authenticated();
                 })
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .oauth2ResourceServer(oauth->oauth.jwt(j->jwtEncoder()))
+                .oauth2ResourceServer(oauth -> oauth.jwt(jwt -> jwtEncoder()))
                 .build();
     }
+
 
     @Bean
     AuthenticationManager authenticationManager() {

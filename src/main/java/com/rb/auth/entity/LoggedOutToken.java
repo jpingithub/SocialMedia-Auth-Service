@@ -12,4 +12,5 @@ public class LoggedOutToken {
     private Integer Id;
     @Column(length = 100000)
     private String token;
+    private Long expiresAt;
 }

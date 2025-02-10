@@ -2,10 +2,9 @@ package com.rb.auth.controller;
 
 import com.nimbusds.jose.JOSEException;
 import com.rb.auth.dto.JWTToken;
+import com.rb.auth.dto.LoginRequest;
 import com.rb.auth.dto.MessageResponse;
 import com.rb.auth.dto.TokenValidationResponse;
-import com.rb.auth.dto.UserDto;
-import com.rb.auth.entity.UserEntity;
 import com.rb.auth.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -24,16 +22,11 @@ public class AuthController {
     @Autowired
     private UserService userService;
 
-    @PostMapping("/register")
-    public ResponseEntity<UserEntity> registerUser(@RequestBody UserDto user) {
-        return ResponseEntity.ok(userService.saveUser(user));
-    }
-
     @PostMapping("/login")
-    public ResponseEntity<JWTToken> login(@RequestBody UserDto userDto) {
-        log.info("Received login request : {}",userDto.toString());
+    public ResponseEntity<JWTToken> login(@RequestBody LoginRequest loginRequest) {
+        log.info("Received login request : {}",loginRequest.toString());
         final JWTToken jwtToken = new JWTToken();
-        jwtToken.setJwtToken(userService.loginUser(userDto));
+        jwtToken.setJwtToken(userService.loginUser(loginRequest));
         return ResponseEntity.ok(jwtToken);
     }
 

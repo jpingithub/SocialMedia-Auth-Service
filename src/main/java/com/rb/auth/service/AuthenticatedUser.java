@@ -1,6 +1,6 @@
 package com.rb.auth.service;
 
-import com.rb.auth.entity.UserEntity;
+import com.rb.auth.dto.User;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -13,7 +13,7 @@ import java.util.Collections;
 @RequiredArgsConstructor
 public class AuthenticatedUser implements UserDetails {
 
-    private final UserEntity userEntity;
+    private final User userEntity;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

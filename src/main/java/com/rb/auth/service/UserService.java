@@ -5,14 +5,11 @@ import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.crypto.RSASSAVerifier;
 import com.nimbusds.jwt.SignedJWT;
 import com.rb.auth.config.RsaConfigurationProperties;
+import com.rb.auth.dto.LoginRequest;
 import com.rb.auth.dto.TokenValidationResponse;
-import com.rb.auth.dto.UserDto;
 import com.rb.auth.entity.LoggedOutToken;
-import com.rb.auth.entity.UserEntity;
 import com.rb.auth.exception.TokenException;
-import com.rb.auth.exception.UserException;
 import com.rb.auth.repository.LoggedOutTokenRepository;
-import com.rb.auth.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +27,6 @@ public class UserService {
 
     private static final Logger log = LoggerFactory.getLogger(UserService.class);
     @Autowired
-    private UserRepository userRepository;
-    @Autowired
     private LoggedOutTokenRepository loggedOutTokenRepository;
     @Autowired
     private ObjectMapper objectMapper;
@@ -44,16 +39,8 @@ public class UserService {
     @Autowired
     private RsaConfigurationProperties rsaConfigurationProperties;
 
-    public UserEntity saveUser(UserDto userDto) {
-        final UserEntity user = objectMapper.convertValue(userDto, UserEntity.class);
-        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        if (userRepository.findByUsername(userDto.getUsername()).isPresent())
-            throw new UserException("User already exists");
-        return userRepository.save(user);
-    }
-
-    public String loginUser(UserDto userDto) {
-        final Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userDto.getUsername(), userDto.getPassword()));
+    public String loginUser(LoginRequest loginRequest) {
+        final Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
         return tokenService.generateToken(authentication);
     }
 

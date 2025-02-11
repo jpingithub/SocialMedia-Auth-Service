@@ -12,12 +12,21 @@ import java.time.Instant;
 public class ExceptionHandler {
 
     @org.springframework.web.bind.annotation.ExceptionHandler(TokenException.class)
-    public ResponseEntity<ExceptionResponse> handleUserException(TokenException ex, WebRequest request){
+    public ResponseEntity<ExceptionResponse> handleTokenException(TokenException ex, WebRequest request) {
         ExceptionResponse exceptionResponse = new ExceptionResponse();
         exceptionResponse.setMessage(ex.getMessage());
         exceptionResponse.setTimeStamp(Instant.now().toString());
         exceptionResponse.setPath(request.getDescription(true));
         return new ResponseEntity<>(exceptionResponse, HttpStatusCode.valueOf(401));
+    }
+
+    @org.springframework.web.bind.annotation.ExceptionHandler(UserException.class)
+    public ResponseEntity<ExceptionResponse> handleUsernameNotFoundException(UserException ex, WebRequest request) {
+        ExceptionResponse exceptionResponse = new ExceptionResponse();
+        exceptionResponse.setMessage(ex.getMessage());
+        exceptionResponse.setTimeStamp(Instant.now().toString());
+        exceptionResponse.setPath(request.getDescription(true));
+        return new ResponseEntity<>(exceptionResponse, HttpStatusCode.valueOf(400));
     }
 
 }

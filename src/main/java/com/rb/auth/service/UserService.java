@@ -6,7 +6,6 @@ import com.nimbusds.jose.crypto.RSASSAVerifier;
 import com.nimbusds.jwt.SignedJWT;
 import com.rb.auth.config.RsaConfigurationProperties;
 import com.rb.auth.dto.LoginRequest;
-import com.rb.auth.dto.TokenValidationResponse;
 import com.rb.auth.entity.LoggedOutToken;
 import com.rb.auth.exception.TokenException;
 import com.rb.auth.repository.LoggedOutTokenRepository;
@@ -54,23 +53,21 @@ public class UserService {
         loggedOutTokenRepository.save(loggedOutToken);
     }
 
-    public TokenValidationResponse validate(String token) throws ParseException, JOSEException {
+    public Boolean validate(String token) throws ParseException, JOSEException {
         Optional<LoggedOutToken> byToken = loggedOutTokenRepository.findByToken(token);
         deleteExpiredTokens();
         if (byToken.isPresent()) throw new TokenException("Token already logged out");
         else {
             SignedJWT signedJWT = SignedJWT.parse(token);
-            if(signedJWT.getJWTClaimsSet().getExpirationTime().getTime()<System.currentTimeMillis()){
+            if (signedJWT.getJWTClaimsSet().getExpirationTime().getTime() < System.currentTimeMillis()) {
                 throw new TokenException("Token expired");
             }
             RSASSAVerifier verifier = new RSASSAVerifier(rsaConfigurationProperties.publicKey());
-            TokenValidationResponse tokenValidationResponse = new TokenValidationResponse();
-            tokenValidationResponse.setIsValid(signedJWT.verify(verifier));
-            return tokenValidationResponse;
+            return signedJWT.verify(verifier);
         }
     }
 
-    private void deleteExpiredTokens(){
+    private void deleteExpiredTokens() {
         loggedOutTokenRepository.deleteByExpiresAtLessThan(System.currentTimeMillis());
     }
 

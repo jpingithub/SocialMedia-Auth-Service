@@ -59,15 +59,20 @@ public class UserService {
     public ValidTokenResponse validate(String token) throws ParseException, JOSEException {
         Optional<LoggedOutToken> byToken = loggedOutTokenRepository.findByToken(token);
         deleteExpiredTokens();
-        if (byToken.isPresent()) throw new TokenException("Token already logged out");
+        if (byToken.isPresent()){
+            log.info("Token not found");
+            throw new TokenException("You logged out");
+        }
         else {
             SignedJWT signedJWT = SignedJWT.parse(token);
             JWTClaimsSet jwtClaimsSet = signedJWT.getJWTClaimsSet();
             if (jwtClaimsSet.getExpirationTime().getTime() < System.currentTimeMillis()) {
+                log.info("Token expired");
                 throw new TokenException("Token expired");
             }
             String username = jwtClaimsSet.getSubject();
             RSASSAVerifier verifier = new RSASSAVerifier(rsaConfigurationProperties.publicKey());
+            log.info("Provided token is valid");
             return ValidTokenResponse.builder().isValid(signedJWT.verify(verifier))
                     .userName(username).build();
         }

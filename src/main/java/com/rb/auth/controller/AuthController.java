@@ -4,6 +4,7 @@ import com.nimbusds.jose.JOSEException;
 import com.rb.auth.dto.JWTToken;
 import com.rb.auth.dto.LoginRequest;
 import com.rb.auth.dto.MessageResponse;
+import com.rb.auth.dto.ValidTokenResponse;
 import com.rb.auth.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +39,7 @@ public class AuthController {
     }
 
     @GetMapping("/validate")
-    public ResponseEntity<Boolean> validateToken(@RequestParam("token") String token) throws ParseException, JOSEException {
+    public ResponseEntity<ValidTokenResponse> validateToken(@RequestParam("token") String token) throws ParseException, JOSEException {
         return ResponseEntity.ok(userService.validate(token));
     }
 

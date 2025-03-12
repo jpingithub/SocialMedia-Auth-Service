@@ -3,9 +3,12 @@ package com.rb.auth.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.crypto.RSASSAVerifier;
+import com.nimbusds.jose.shaded.gson.JsonObject;
+import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import com.rb.auth.config.RsaConfigurationProperties;
 import com.rb.auth.dto.LoginRequest;
+import com.rb.auth.dto.ValidTokenResponse;
 import com.rb.auth.entity.LoggedOutToken;
 import com.rb.auth.exception.TokenException;
 import com.rb.auth.repository.LoggedOutTokenRepository;
@@ -53,17 +56,25 @@ public class UserService {
         loggedOutTokenRepository.save(loggedOutToken);
     }
 
-    public Boolean validate(String token) throws ParseException, JOSEException {
+    public ValidTokenResponse validate(String token) throws ParseException, JOSEException {
         Optional<LoggedOutToken> byToken = loggedOutTokenRepository.findByToken(token);
         deleteExpiredTokens();
-        if (byToken.isPresent()) throw new TokenException("Token already logged out");
+        if (byToken.isPresent()){
+            log.info("Token not found");
+            throw new TokenException("You logged out");
+        }
         else {
             SignedJWT signedJWT = SignedJWT.parse(token);
-            if (signedJWT.getJWTClaimsSet().getExpirationTime().getTime() < System.currentTimeMillis()) {
+            JWTClaimsSet jwtClaimsSet = signedJWT.getJWTClaimsSet();
+            if (jwtClaimsSet.getExpirationTime().getTime() < System.currentTimeMillis()) {
+                log.info("Token expired");
                 throw new TokenException("Token expired");
             }
+            String username = jwtClaimsSet.getSubject();
             RSASSAVerifier verifier = new RSASSAVerifier(rsaConfigurationProperties.publicKey());
-            return signedJWT.verify(verifier);
+            log.info("Provided token is valid");
+            return ValidTokenResponse.builder().isValid(signedJWT.verify(verifier))
+                    .userName(username).build();
         }
     }
 
